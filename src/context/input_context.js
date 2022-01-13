@@ -21,14 +21,16 @@ const InputProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const setInput = (e) => {
-    const value = e.target.value
     const name = e.target.name
+    let value = e.target.value
+    if (name === 'porosity' && (value < 0 || value > 100)) {
+      value = 0
+    }
     dispatch({ type: SET_INPUT, payload: { name, value } })
   }
 
   const setImport = (e) => {
     readXlsxFile(e.target.files[0]).then((rows) => {
-      console.log(rows)
       dispatch({ type: SET_IMPORT, payload: rows })
     })
   }

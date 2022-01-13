@@ -23,7 +23,7 @@ const InputElementWrapper = styled.div`
   justify-items: space-between;
 
   label {
-    text-align: center;
+    place-self: center;
   }
 
   input {

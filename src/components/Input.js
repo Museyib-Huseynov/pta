@@ -32,17 +32,22 @@ const InputWrapper = styled.form`
   background: #c8c8c8;
   padding: 1rem;
 
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+
   h1 {
     margin: auto;
   }
 
   .file {
     width: max-content;
-    padding: 0.8rem;
     margin: auto;
+    padding: 0.8rem;
     background: green;
     color: white;
     border-radius: 10px;
+    letter-spacing: 2px;
     cursor: pointer;
   }
 `
