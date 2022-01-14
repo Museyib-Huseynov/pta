@@ -1,48 +1,63 @@
+import { useRef, useEffect } from 'react'
 import { Input } from '../components'
 import styled from 'styled-components'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import { Pie } from 'react-chartjs-2'
+import { useInputContext } from '../context/input_context'
+import Chart from 'chart.js/auto'
+import { getRelativePosition } from 'chart.js/helpers'
 
 const Home = () => {
-  ChartJS.register(ArcElement, Tooltip, Legend)
-  const data = {
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-    datasets: [
-      {
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
+  const canvasElement = useRef(null)
+  const { importedData } = useInputContext()
+
+  useEffect(() => {
+    if (importedData.length !== 0) {
+      const data = {
+        datasets: [
+          {
+            label: 'Pressure vs time',
+            data: importedData,
+            backgroundColor: 'green',
+            fill: false,
+            // borderColor: 'rgb(75, 192, 192)',
+            tension: 0,
+          },
         ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-        ],
-        borderWidth: 1,
-      },
-    ],
-  }
+      }
+
+      const config = {
+        type: 'scatter',
+        data: data,
+        options: {
+          scales: {
+            x: {
+              type: 'linear',
+              position: 'bottom',
+              ticks: { color: 'blue' },
+            },
+          },
+          onClick: (e) => {
+            const canvasPosition = getRelativePosition(e, myChart)
+            console.log(canvasPosition)
+            // Substitute the appropriate scale IDs
+            const dataX = myChart.scales.x.getValueForPixel(canvasPosition.x)
+            const dataY = myChart.scales.y.getValueForPixel(canvasPosition.y)
+            console.log(dataX, dataY)
+          },
+        },
+      }
+      const myChart = new Chart(canvasElement.current, config)
+      return () => myChart.destroy()
+    }
+  }, [importedData])
 
   return (
     <HomeWrapper>
       <Input />
-      <div className='pie'>
-        <Pie
-          data={data}
-          width='100px'
-          height='100px'
-          options={{ maintainAspectRatio: false }}
-        />
-      </div>
+      {importedData.length !== 0 && (
+        <div className='chart-container'>
+          <canvas id='chart' ref={canvasElement}></canvas>
+        </div>
+      )}
     </HomeWrapper>
   )
 }
@@ -56,6 +71,12 @@ const HomeWrapper = styled.div`
     position: relative;
     height: 300px;
     width: 300px;
+  }
+
+  .chart-container {
+    position: relative;
+    height: 600px;
+    width: 600px;
   }
 `
 export default Home
