@@ -6,14 +6,17 @@ import PressureTime from '../charts/PressureTime'
 
 const Home = () => {
   const { importedData } = useInputContext()
-
+  const importedData_new = importedData.map((item) => [
+    Math.log10(item[0]),
+    item[1],
+  ])
   return (
     <HomeWrapper>
       <Input />
       {importedData.length !== 0 && (
         <div style={{ position: 'relative', width: '600px' }}>
           <PressureTime data={importedData} />
-          <PressureTime data={importedData} type='logarithmic' />
+          <PressureTime data={importedData_new} type='logarithmic' />
         </div>
       )}
     </HomeWrapper>
