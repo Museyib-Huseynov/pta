@@ -31,6 +31,7 @@ const InputProvider = ({ children }) => {
 
   const setImport = (e) => {
     readXlsxFile(e.target.files[0]).then((rows) => {
+      console.log(rows)
       dispatch({ type: SET_IMPORT, payload: rows })
     })
   }
