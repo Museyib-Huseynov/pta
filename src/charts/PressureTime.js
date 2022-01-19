@@ -1,5 +1,6 @@
 import { Chart, registerables } from 'chart.js'
 import { getRelativePosition } from 'chart.js/helpers'
+import annotationPlugin from 'chartjs-plugin-annotation'
 import { Scatter } from 'react-chartjs-2'
 import { useRef } from 'react'
 import regression from 'regression'
@@ -7,7 +8,7 @@ import regression from 'regression'
 function PressureTime(props) {
   const chartRef = useRef(null)
 
-  Chart.register(...registerables)
+  Chart.register(...registerables, annotationPlugin)
 
   const data = {
     datasets: [
@@ -52,7 +53,7 @@ function PressureTime(props) {
       },
     },
     onClick: (e) => {
-      if (chartRef.current) {
+      if (chartRef.current && props.type === 'MDH') {
         const canvasPosition = getRelativePosition(e, chartRef.current)
         const dataX = chartRef.current.scales.x.getValueForPixel(
           canvasPosition.x
@@ -66,19 +67,36 @@ function PressureTime(props) {
           }
         }
         console.log(regressionArray)
+        console.log(regressionArray[regressionArray.length - 1])
 
         const result = regression.linear(regressionArray)
         console.log(result)
+        console.log(result.predict(2))
 
-        const second_data = {
-          label: 'regression',
-          data: result.points,
-          backgroundColor: 'black',
+        if (result.r2) {
+          //check to see when click out of range no error in console
+          chartRef.current.options.plugins.annotation.annotations = {
+            line1: {
+              type: 'line',
+              xMin: dataX - 1.5,
+              yMin: result.predict(dataX - 1.5)[1],
+              xMax: regressionArray[regressionArray.length - 1][0],
+              yMax: result.predict(
+                regressionArray[regressionArray.length - 1][0]
+              )[1],
+              borderColor: 'black',
+              borderWidth: 2,
+              label: {
+                enabled: true,
+                content: result.string,
+                backgroundColor: 'green',
+                padding: 10,
+                xAdjust: -150,
+                // yAdjust: -10,
+              },
+            },
+          }
         }
-        if (chartRef.current.data.datasets.length > 1) {
-          chartRef.current.data.datasets.pop()
-        }
-        chartRef.current.data.datasets.push(second_data)
         chartRef.current.update()
       }
     },
