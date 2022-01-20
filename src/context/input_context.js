@@ -10,8 +10,8 @@ const initialState = {
   wellRadius: '',
   fvf: '',
   effectiveThickness: '',
-  flowingWellborePressure: '',
   rate: '',
+  productionTime: '',
   importedData: [],
 }
 

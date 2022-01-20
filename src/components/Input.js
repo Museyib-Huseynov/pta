@@ -8,15 +8,16 @@ const Input = () => {
     <InputWrapper>
       <h1>Input data</h1>
       <InputElement type='porosity' label='Porosity (%)' />
-      <InputElement type='viscosity' label='Viscosity (cP)' />
-      <InputElement type='effectiveThickness' label='EffectiveThickness (m)' />
-      <InputElement type='fvf' label='FVF (m3/m3)' />
+      <InputElement type='viscosity' label='Viscosity (cp)' />
+      <InputElement type='effectiveThickness' label='EffectiveThickness (ft)' />
+      <InputElement type='fvf' label='FVF (bbl/STB)' />
       <InputElement
         type='totalCompressibility'
-        label='Total compressibility (1/atm)'
+        label='Total compressibility (1/psi)'
       />
-      <InputElement type='wellRadius' label='Well radius (mm)' />
-      <InputElement type='rate' label='Flowing rate (m3/day)' />
+      <InputElement type='wellRadius' label='Well radius (ft)' />
+      <InputElement type='rate' label='Flowing rate (STB/day)' />
+      <InputElement type='productionTime' label='Production time (hour)' />
       <label htmlFor='file' className='file'>
         Import Pressure data
       </label>

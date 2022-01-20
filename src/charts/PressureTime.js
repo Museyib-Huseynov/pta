@@ -2,10 +2,13 @@ import { Chart, registerables } from 'chart.js'
 import { getRelativePosition } from 'chart.js/helpers'
 import annotationPlugin from 'chartjs-plugin-annotation'
 import { Scatter } from 'react-chartjs-2'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import regression from 'regression'
+import { Result } from '../components'
 
 function PressureTime(props) {
+  const [regressionLine, setRegressionLine] = useState(0)
+  const [annotations, setAnnotations] = useState(null)
   const chartRef = useRef(null)
 
   Chart.register(...registerables, annotationPlugin)
@@ -25,7 +28,7 @@ function PressureTime(props) {
       x: {
         title: {
           display: true,
-          text: 'Time, sec',
+          text: props.xAxisName,
         },
       },
       y: {
@@ -37,6 +40,7 @@ function PressureTime(props) {
     },
     plugins: {
       legend: {
+        display: false,
         position: 'top',
         labels: {
           usePointStyle: true,
@@ -48,12 +52,24 @@ function PressureTime(props) {
           },
         },
       },
+      title: {
+        display: true,
+        text: props.type,
+        position: 'bottom',
+        font: {
+          size: 14,
+          weight: 'bold',
+        },
+      },
       tooltip: {
         enabled: false,
       },
+      annotation: {
+        annotations,
+      },
     },
     onClick: (e) => {
-      if (chartRef.current && props.type === 'MDH') {
+      if (chartRef.current && props.type === 'MDH method') {
         const canvasPosition = getRelativePosition(e, chartRef.current)
         const dataX = chartRef.current.scales.x.getValueForPixel(
           canvasPosition.x
@@ -70,6 +86,7 @@ function PressureTime(props) {
         console.log(regressionArray[regressionArray.length - 1])
 
         const result = regression.linear(regressionArray)
+        setRegressionLine(result)
         console.log(result)
         console.log(result.predict(2))
 
@@ -78,8 +95,8 @@ function PressureTime(props) {
           chartRef.current.options.plugins.annotation.annotations = {
             line1: {
               type: 'line',
-              xMin: dataX - 1.5,
-              yMin: result.predict(dataX - 1.5)[1],
+              xMin: dataX - 0.5,
+              yMin: result.predict(dataX - 0.5)[1],
               xMax: regressionArray[regressionArray.length - 1][0],
               yMax: result.predict(
                 regressionArray[regressionArray.length - 1][0]
@@ -89,7 +106,7 @@ function PressureTime(props) {
               label: {
                 enabled: true,
                 content: result.string,
-                backgroundColor: 'green',
+                backgroundColor: '#000',
                 padding: 10,
                 xAdjust: -150,
                 // yAdjust: -10,
@@ -98,14 +115,21 @@ function PressureTime(props) {
           }
         }
         chartRef.current.update()
+        setAnnotations(chartRef.current.options.plugins.annotation.annotations)
       }
     },
   }
-
-  if (props.type) {
-    // options.scales.x.type = 'logarithmic'
-  }
-  return <Scatter options={options} data={data} ref={chartRef} />
+  return (
+    <>
+      <Scatter
+        options={options}
+        data={data}
+        ref={chartRef}
+        style={{ cursor: 'crosshair' }}
+      />
+      <Result type={props.type} regressionLine={regressionLine} />
+    </>
+  )
 }
 
 export default PressureTime

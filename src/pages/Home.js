@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { Outlet, NavLink } from 'react-router-dom'
 import { Input } from '../components'
 import styled from 'styled-components'
 import { useInputContext } from '../context/input_context'
@@ -6,17 +6,33 @@ import PressureTime from '../charts/PressureTime'
 
 const Home = () => {
   const { importedData } = useInputContext()
-  const importedData_new = importedData.map((item) => [
-    Math.log10(item[0]),
-    item[1],
-  ])
   return (
     <HomeWrapper>
       <Input />
       {importedData.length !== 0 && (
-        <div style={{ position: 'relative', width: '600px' }}>
-          <PressureTime data={importedData} />
-          <PressureTime data={importedData_new} type='logarithmic' />
+        <div className='graphs'>
+          <PressureTime data={importedData} xAxisName='Time, hour' />
+          <nav className='links'>
+            <NavLink
+              to='/mdh'
+              className={({ isActive }) => (isActive ? 'link active' : 'link')}
+            >
+              MDH
+            </NavLink>
+            <NavLink
+              to='/horner'
+              className={({ isActive }) => (isActive ? 'link active' : 'link')}
+            >
+              Horner
+            </NavLink>
+            <NavLink
+              to='/agarwal'
+              className={({ isActive }) => (isActive ? 'link active' : 'link')}
+            >
+              Agarwal Equivalent-Time
+            </NavLink>
+          </nav>
+          <Outlet />
         </div>
       )}
     </HomeWrapper>
@@ -26,18 +42,44 @@ const Home = () => {
 const HomeWrapper = styled.div`
   height: 100vh;
   display: grid;
-  grid-template-columns: 350px auto;
+  grid-template-columns: 350px 600px auto;
 
-  .pie {
-    position: relative;
-    height: 300px;
-    width: 300px;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+
+  .graphs {
+    display: grid;
+    grid-auto-flow: row;
+    grid-auto-rows: min-content;
+    padding: 30px 10px;
+    // grid-gap: 2rem;
   }
 
-  .chart-container {
-    position: relative;
-    height: 600px;
-    width: 600px;
+  .links {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 2rem;
+    // place-items: center;
+  }
+
+  .link {
+    width: 100%;
+    text-align: center;
+    border: 2px solid green;
+    color: #000;
+    padding: 10px 0;
+  }
+
+  .link:nth-child(2) {
+    border-left: none;
+    border-right: none;
+  }
+
+  .active {
+    background: green;
+    color: white;
   }
 `
 export default Home
