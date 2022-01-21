@@ -26,16 +26,16 @@ function Result({ type, regressionLine }) {
     productionTime !== ''
 
   const inputEmptyWarning = (
-    <p className='warning'>Please fill all input data to see the result</p>
+    <p className='warning'>Please fill all input data</p>
   )
   const regressionWarning = (
-    <p className='warning'>Please draw the regression line to see the result</p>
+    <p className='warning'>Please draw the regression line</p>
   )
 
   const calcPerm = () => {
     if (!regressionLine) return null
     if (!allInputsFilled) return null
-    const slope = regressionLine.equation[0]
+    const slope = Math.abs(regressionLine.equation[0])
     return (
       (162.6 * rate * fvf * viscosity) /
       (slope * effectiveThickness)
@@ -47,8 +47,16 @@ function Result({ type, regressionLine }) {
   const calcSkin = () => {
     if (!regressionLine) return null
     if (!allInputsFilled) return null
-    const slope = regressionLine.equation[0]
-    const pressureAtOneHour = regressionLine.predict(0)[1]
+    const slope = Math.abs(regressionLine.equation[0])
+    let pressureAtOneHour = 0
+    if (type === 'MDH method') {
+      pressureAtOneHour = regressionLine.predict(0)[1]
+    }
+    if (type === 'Horner method') {
+      pressureAtOneHour = regressionLine.predict(
+        Math.log10((productionTime + 1) / 1)
+      )[1]
+    }
     const flowingWellborePressure = importedData[0][1]
     return (
       1.151 *

@@ -4,8 +4,19 @@ import PressureTime from './charts/PressureTime'
 import { useInputContext } from './context/input_context'
 
 function App() {
-  const { importedData } = useInputContext()
+  let { importedData, productionTime } = useInputContext()
   const MDH_data = importedData.map((item) => [Math.log10(item[0]), item[1]])
+
+  const Horner_data = []
+  if (productionTime) {
+    for (let item of importedData) {
+      if (item[0] === 0) continue
+      Horner_data.push([
+        Math.log10((+productionTime + item[0]) / item[0]),
+        item[1],
+      ])
+    }
+  }
   return (
     <BrowserRouter>
       <Routes>
@@ -29,7 +40,8 @@ function App() {
               <PressureTime
                 data={MDH_data}
                 type='MDH method'
-                xAxisName='Log(Δt)'
+                xAxisName='Log (Δt)'
+                key='1'
               />
             }
           />
@@ -37,9 +49,10 @@ function App() {
             path='horner'
             element={
               <PressureTime
-                data={MDH_data}
-                type='MDH method'
-                xAxisName='Log(Δt)'
+                data={Horner_data}
+                type='Horner method'
+                xAxisName='Log (Horner time ratio)'
+                key='2'
               />
             }
           />
